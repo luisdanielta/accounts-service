@@ -12,7 +12,7 @@ if ($option -eq "go")
 elseif ($Option -eq "dev")
 {
     Write-Host "mode dev"
-    air app.go
+    air -c .air.toml
     exit 0
 }
 elseif ($Option -eq "build")
