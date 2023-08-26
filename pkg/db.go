@@ -31,7 +31,6 @@ func Conn(dsn DSN) (*gorm.DB, error) {
 	return DB, ERR
 }
 
-/* connection database qfsd_dashboard */
 func ConnQD() (*gorm.DB, error) {
 	/* set up the DSN for the database */
 	dsn := DSN{

@@ -11,9 +11,8 @@ func Error(err error) {
 	}
 }
 
-func HttpError(err error, w http.ResponseWriter) {
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+func HttpSendError(w http.ResponseWriter, e error) {
+	w.WriteHeader(http.StatusInternalServerError)
+	_, err := w.Write([]byte(e.Error()))
+	Error(err)
 }

@@ -35,6 +35,11 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "404 Not found", http.StatusNotFound)
 		return
 	}
+	w.WriteHeader(http.StatusOK)
+	_, err := w.Write([]byte("Hello world"))
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 var Routes = []Route{
