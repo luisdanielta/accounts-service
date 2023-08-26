@@ -1,12 +1,13 @@
 package utils
 
 import (
+	"fmt"
 	"net/http"
 )
 
 func Error(err error) {
 	if err != nil {
-		panic(err)
+		fmt.Println(err.Error())
 	}
 }
 

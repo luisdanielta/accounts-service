@@ -4,8 +4,48 @@ import (
 	"as/internal/models"
 	"as/pkg"
 	"as/utils"
+	"encoding/json"
+	"fmt"
 	"net/http"
 )
+
+// Response structure for API responses
+type Response struct {
+	Status      int         `json:"status"`
+	Msg         string      `json:"msg"`
+	Data        interface{} `json:"data"`
+	Application string
+}
+
+// Marshal returns JSON-encoded response
+func (r *Response) Marshal() []byte {
+	jsonData := map[string]interface{}{
+		"status": r.Status,
+		"msg":    r.Msg,
+		"data":   r.Data,
+	}
+
+	res, err := json.Marshal(jsonData)
+	utils.Error(err)
+	return res
+}
+
+// Send sends the response to the client
+func (r *Response) Send(w http.ResponseWriter) {
+	w.Header().Set("Content-Type", fmt.Sprintf("application/%s", r.Application))
+	w.WriteHeader(r.Status)
+	_, err := w.Write(r.Marshal())
+	utils.Error(err)
+}
+
+func ValidateRequiredFields(r *http.Request, fields []string) bool {
+	for _, field := range fields {
+		if r.FormValue(field) == "" {
+			return false
+		}
+	}
+	return true
+}
 
 func AddUserPost(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
@@ -14,7 +54,7 @@ func AddUserPost(w http.ResponseWriter, r *http.Request) {
 	db := pkg.ConnDB.GetConn()
 	requiredFields := []string{"name", "lastname", "username", "email", "password"}
 
-	if ValidateRequiredFields(r, requiredFields) {
+	if !ValidateRequiredFields(r, requiredFields) {
 		res := Response{
 			Status:      http.StatusBadRequest,
 			Msg:         "Required fields are missing.",
@@ -25,6 +65,7 @@ func AddUserPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var user models.User
+
 	user.Name = r.FormValue("name")
 	user.LastName = r.FormValue("lastname")
 
@@ -120,135 +161,6 @@ func DeleteUserDelete(w http.ResponseWriter, r *http.Request) {
 	res := Response{
 		Status:      http.StatusOK,
 		Msg:         "User deleted successfully.",
-		Application: "json",
-	}
-	res.Send(w)
-}
-
-func GetUserGet(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	utils.Error(err)
-
-	db := pkg.ConnDB.GetConn()
-
-	if ValidateRequiredFields(r, []string{"id"}) {
-		res := Response{
-			Status:      http.StatusBadRequest,
-			Msg:         "Required fields are missing.",
-			Application: "json",
-		}
-		res.Send(w)
-		return
-	}
-
-	var user models.User
-	id := r.FormValue("id")
-	if err := db.Where("id = ?", id).First(&user).Error; err != nil {
-		res := Response{
-			Status:      http.StatusNotFound,
-			Msg:         "User not found.",
-			Application: "json",
-		}
-		res.Send(w)
-		return
-	}
-
-	res := Response{
-		Status:      http.StatusOK,
-		Msg:         "User found.",
-		Data:        user,
-		Application: "json",
-	}
-	res.Send(w)
-}
-
-func UpdateUserPut(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	utils.Error(err)
-
-	db := pkg.ConnDB.GetConn()
-
-	if ValidateRequiredFields(r, []string{"id"}) {
-		res := Response{
-			Status:      http.StatusBadRequest,
-			Msg:         "Required fields are missing.",
-			Application: "json",
-		}
-		res.Send(w)
-		return
-	}
-
-	var user models.User
-	id := r.FormValue("id")
-	if err := db.Where("id = ?", id).First(&user).Error; err != nil {
-		res := Response{
-			Status:      http.StatusNotFound,
-			Msg:         "User not found.",
-			Application: "json",
-		}
-		res.Send(w)
-		return
-	}
-
-	if r.FormValue("name") != "" {
-		user.Name = r.FormValue("name")
-	}
-
-	if r.FormValue("lastname") != "" {
-		user.LastName = r.FormValue("lastname")
-	}
-
-	if r.FormValue("email") != "" {
-		email := models.Email(r.FormValue("email"))
-		msg, valid := email.Validate(db)
-		if !valid {
-			res := Response{
-				Status:      http.StatusBadRequest,
-				Msg:         msg,
-				Application: "json",
-			}
-			res.Send(w)
-			return
-		}
-		user.Email = email
-	}
-
-	if r.FormValue("username") != "" {
-		username := models.Username(r.FormValue("username"))
-		msg, valid := username.Validate(db)
-		if !valid {
-			res := Response{
-				Status:      http.StatusBadRequest,
-				Msg:         msg,
-				Application: "json",
-			}
-			res.Send(w)
-			return
-		}
-		user.Username = username
-	}
-
-	if r.FormValue("password") != "" {
-		password := models.Password(r.FormValue("password"))
-		hash, err := password.Encrypt()
-		utils.Error(err)
-		user.Password = models.Password(hash)
-	}
-
-	if err := db.Save(&user).Error; err != nil {
-		res := Response{
-			Status:      http.StatusInternalServerError,
-			Msg:         err.Error(),
-			Application: "json",
-		}
-		res.Send(w)
-		return
-	}
-
-	res := Response{
-		Status:      http.StatusOK,
-		Msg:         "User updated successfully.",
-		Data:        user,
 		Application: "json",
 	}
 	res.Send(w)

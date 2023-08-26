@@ -2,7 +2,6 @@ package models
 
 import (
 	"fmt"
-	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -16,8 +15,8 @@ type User struct {
 	gorm.Model
 	Name     string   `gorm:"type:varchar(255);not null" json:"name"`
 	LastName string   `gorm:"type:varchar(255);not null" json:"lastname"`
-	Username Username `gorm:"type:varchar(255);not null;unique" json:"username"`
-	Email    Email    `gorm:"type:varchar(255);not null;unique" json:"email"`
+	Username Username `gorm:"type:varchar(255);not null" json:"username"`
+	Email    Email    `gorm:"type:varchar(255);not null" json:"email"`
 	Password Password `gorm:"type:varchar(255);not null" json:"password"`
 }
 
@@ -37,15 +36,23 @@ func (p Password) Compare(plainPassword string) error {
 }
 
 /* funcs email type */
-func (e Email) Validate(db *gorm.DB) (string, bool) {
-	email := string(e)
+func (e *Email) Validate(db *gorm.DB) (string, bool) {
+	email := string(*e)
 
 	if !CheckItemExists(db, "email", email) {
 		return "Email already exists.", false
 	}
 
 	/* Validate that the email has the correct domain */
-	if !strings.HasSuffix(email, "@quantum-fsd.com") {
+	/* validate email only quantum-fsd */
+	index := 0
+	for i, v := range email {
+		if string(v) == "@" {
+			index = i
+			break
+		}
+	}
+	if email[index:] != "@quantum-fsd.com" {
 		return "Email is not valid.", false
 	}
 
@@ -67,9 +74,7 @@ func (u *Username) Validate(db *gorm.DB) (string, bool) {
 
 func CheckItemExists(db *gorm.DB, field string, value string) bool {
 	var user User
-	if err := db.Where(fmt.Sprintf("%s = ?", field), value).First(&user).Error; err == nil {
-		return false
-	}
-	db = nil
-	return true
+	r := db.Where(fmt.Sprintf("%s = ?", field), value).First(&user)
+	return r.RowsAffected == 0
+
 }

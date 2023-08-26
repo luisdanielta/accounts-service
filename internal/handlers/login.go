@@ -31,7 +31,7 @@ func LoginPost(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	utils.Error(err)
 
-	if ValidateRequiredFields(r, []string{"username", "password"}) {
+	if !ValidateRequiredFields(r, []string{"username", "password"}) {
 		res := Response{
 			Status:      http.StatusBadRequest,
 			Msg:         "Required fields are missing.",
@@ -42,11 +42,15 @@ func LoginPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var user models.User
-
 	db := pkg.ConnDB.GetConn()
 
+	username := models.Username(r.FormValue("username"))
+	// password := models.Password(r.FormValue("password"))
+
 	// Get username and password from database
-	if err := db.Where("username = ?", r.FormValue("username")).First(&user).Error; err != nil {
+	result := db.Where("username = ?", username).First(&user)
+	rt := result.RowsAffected == 0
+	if rt {
 		res := Response{
 			Status:      http.StatusNotFound,
 			Msg:         "Invalid username or password.",
