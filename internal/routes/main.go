@@ -41,11 +41,13 @@ var Routes = []Route{
 
 	{Url: "/", Func: []http.HandlerFunc{handleIndex}, Method: []string{"GET"}},
 
-	{Url: "/register", Func: []http.HandlerFunc{handlers.AddUserPost}, Method: []string{"POST"}},
+	{Url: "/user/add", Func: []http.HandlerFunc{handlers.AddPost}, Method: []string{"POST"}},
 
 	{Url: "/login", Func: []http.HandlerFunc{handlers.LoginPost}, Method: []string{"POST"}},
 
-	{Url: "/users", Func: []http.HandlerFunc{handlers.AllUsersGet}, Method: []string{"GET"}},
+	{Url: "/users", Func: []http.HandlerFunc{handlers.GetUsers}, Method: []string{"GET"}},
 
-	{Url: "/user", Func: []http.HandlerFunc{handlers.DeleteUserDelete}, Method: []string{"DELETE"}},
+	{Url: "/user/detele", Func: []http.HandlerFunc{handlers.DeleteUser}, Method: []string{"DELETE"}},
+
+	{Url: "/user/", Func: []http.HandlerFunc{handlers.GetUser}, Method: []string{"GET"}},
 }
