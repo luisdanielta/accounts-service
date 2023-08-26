@@ -44,7 +44,6 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 
 var Routes = []Route{
 	{Url: "/", Func: []http.HandlerFunc{handleIndex}, Method: []string{"GET"}},
-
-	/* register */
 	{Url: "/register", Func: []http.HandlerFunc{handlers.RegisterPost}, Method: []string{"POST"}},
+	{Url: "/login", Func: []http.HandlerFunc{handlers.LoginPost}, Method: []string{"POST"}},
 }

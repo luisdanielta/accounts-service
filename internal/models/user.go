@@ -1,45 +1,76 @@
 package models
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"fmt"
+	"strings"
 
-type Email struct {
-	Value string `json:"value"`
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
+)
+
+type Email string
+type Password string
+type Username string
+
+type User struct {
+	gorm.Model
+	Name     string   `gorm:"type:varchar(255);not null" json:"name"`
+	LastName string   `gorm:"type:varchar(255);not null" json:"lastname"`
+	Username Username `gorm:"type:varchar(255);not null;unique" json:"username"`
+	Email    Email    `gorm:"type:varchar(255);not null;unique" json:"email"`
+	Password Password `gorm:"type:varchar(255);not null" json:"password"`
 }
 
-func (e *Email) Validate() (bool, error) {
-	/* check out Email */
-	index := 0
-	for i, v := range e.Value {
-		if v == '@' {
-			index = i
-			break
-		}
-	}
-	return e.Value[index:] == "@quantum-fsd.com", nil
-}
-
-type Password struct {
-	Value string `json:"value"`
-}
-
+/* funcs password type */
 func (p *Password) Encrypt() (string, error) {
 	/* encrypt password */
-	hash, err := bcrypt.GenerateFromPassword([]byte(p.Value), bcrypt.DefaultCost)
+	pass := string(*p)
+	hash, err := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
 	if err != nil {
 		return "", err
 	}
 	return string(hash), nil
 }
 
-func (p *Password) Decrypt(hash string) error {
-	/* decrypt password */
-	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(p.Value))
+func (p Password) Compare(plainPassword string) error {
+	return bcrypt.CompareHashAndPassword([]byte(p), []byte(plainPassword))
 }
 
-type User struct {
-	Name     string   `json:"name"`
-	LastName string   `json:"lastname"`
-	Username string   `json:"username"`
-	Email    Email    `json:"email"`
-	Password Password `json:"password"`
+/* funcs email type */
+func (e *Email) Validate(db *gorm.DB) (string, bool) {
+	email := string(*e)
+
+	if !CheckItemExists(db, "email", email) {
+		return "Email already exists.", false
+	}
+
+	/* Validate that the email has the correct domain */
+	if !strings.HasSuffix(email, "@quantum-fsd.com") {
+		return "Email is not valid.", false
+	}
+
+	return "", true
+}
+
+/* funcs username type */
+func (u *Username) Validate(db *gorm.DB) (string, bool) {
+	/* get username */
+	username := string(*u)
+
+	/* check if the username already exists */
+	if !CheckItemExists(db, "username", username) {
+		return "Username already exists.", false
+	}
+
+	return "", true
+}
+
+/* funcs */
+func CheckItemExists(db *gorm.DB, field string, value string) bool {
+	var user User
+	if err := db.Where(fmt.Sprintf("%s = ?", field), value).First(&user).Error; err == nil {
+		return false
+	}
+	db = nil
+	return true
 }

@@ -2,11 +2,11 @@ $ENV = @{
     "JWT_KEY" = "88U)3F!!SlirpLZP(a^v-l0pj(ivN+f+~&J9m-6t~TZ51@l2F2"
 
     # database - qfsd_dashboard_postgresql
-    "DBQDH" = "192.168.1.201"
-    "DBQDPP" = "5432"
-    "DBQDU" = "admin@qfsd-linux"
-    "DBQDP" = "CAL3158focas?"
-    "DBQDD" = "qfsd"
+    "DBQDH" = "containers-us-west-34.railway.app"
+    "DBQDPP" = "5938"
+    "DBQDU" = "postgres"
+    "DBQDP" = "ABjpX5SSjHqN29LJivPF"
+    "DBQDD" = "railway"
 }
 
 foreach ($key in $ENV.Keys)
