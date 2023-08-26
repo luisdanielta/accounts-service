@@ -11,7 +11,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-var jwtSecret = env.JWT_KEY
+var jwtSecret = []byte(env.JWT_KEY)
 
 func generateToken(user models.User) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)

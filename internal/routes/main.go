@@ -49,5 +49,5 @@ var Routes = []Route{
 
 	{Url: "/user/detele", Func: []http.HandlerFunc{handlers.DeleteUser}, Method: []string{"DELETE"}},
 
-	{Url: "/user/", Func: []http.HandlerFunc{handlers.GetUser}, Method: []string{"GET"}},
+	{Url: "/user", Func: []http.HandlerFunc{handlers.GetUser}, Method: []string{"GET"}},
 }
