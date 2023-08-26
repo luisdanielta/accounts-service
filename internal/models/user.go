@@ -37,8 +37,8 @@ func (p Password) Compare(plainPassword string) error {
 }
 
 /* funcs email type */
-func (e *Email) Validate(db *gorm.DB) (string, bool) {
-	email := string(*e)
+func (e Email) Validate(db *gorm.DB) (string, bool) {
+	email := string(e)
 
 	if !CheckItemExists(db, "email", email) {
 		return "Email already exists.", false
@@ -65,7 +65,6 @@ func (u *Username) Validate(db *gorm.DB) (string, bool) {
 	return "", true
 }
 
-/* funcs */
 func CheckItemExists(db *gorm.DB, field string, value string) bool {
 	var user User
 	if err := db.Where(fmt.Sprintf("%s = ?", field), value).First(&user).Error; err == nil {

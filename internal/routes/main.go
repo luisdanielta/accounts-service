@@ -35,15 +35,18 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "404 Not found", http.StatusNotFound)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
-	_, err := w.Write([]byte("Hello world"))
-	if err != nil {
-		log.Fatal(err)
-	}
 }
 
 var Routes = []Route{
+
 	{Url: "/", Func: []http.HandlerFunc{handleIndex}, Method: []string{"GET"}},
-	{Url: "/register", Func: []http.HandlerFunc{handlers.RegisterPost}, Method: []string{"POST"}},
+
+	{Url: "/register", Func: []http.HandlerFunc{handlers.AddUserPost}, Method: []string{"POST"}},
+
+	{Url: "/user", Func: []http.HandlerFunc{handlers.GetUserGet, handlers.UpdateUserPut,
+		handlers.DeleteUserDelete}, Method: []string{"GET", "PUT", "DELETE"}},
+
+	{Url: "/users", Func: []http.HandlerFunc{handlers.AllUsersGet}, Method: []string{"GET"}},
+
 	{Url: "/login", Func: []http.HandlerFunc{handlers.LoginPost}, Method: []string{"POST"}},
 }

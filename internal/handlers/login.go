@@ -31,6 +31,16 @@ func LoginPost(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	utils.Error(err)
 
+	if ValidateRequiredFields(r, []string{"username", "password"}) {
+		res := Response{
+			Status:      http.StatusBadRequest,
+			Msg:         "Required fields are missing.",
+			Application: "json",
+		}
+		res.Send(w)
+		return
+	}
+
 	var user models.User
 
 	db := pkg.ConnDB.GetConn()
