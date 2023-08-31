@@ -13,6 +13,9 @@ import (
 
 var jwtSecret = []byte(env.JWT_KEY)
 
+
+
+
 func generateToken(user models.User) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)

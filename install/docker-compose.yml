@@ -1,20 +1,19 @@
-version: '2.1'
+version: "2.1"
 
 services:
-  postgres:
-    image: postgres
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
-    volumes:
-      - pg:/var/lib/postgresql/data
+  db:
+    image: postgres:10.3
+    container_name: "qfsd-db-postgres"
+    restart: always
     ports:
       - "5432:5432"
-    restart: always
-    networks:
-      - default
+    environment:
+      POSTGRES_USER: "qfsd"
+      POSTGRES_PASSWORD: "qfsd"
+      POSTGRES_DB: "qfsd"
+    volumes:
+      - qfsd_db_data:/var/lib/postgresql/data
 
 volumes:
-  pg:
+  qfsd_db_data:
     external: true

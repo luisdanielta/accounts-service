@@ -41,7 +41,7 @@ var Routes = []Route{
 
 	{Url: "/", Func: []http.HandlerFunc{handleIndex}, Method: []string{"GET"}},
 
-	{Url: "/user/add", Func: []http.HandlerFunc{handlers.AddPost}, Method: []string{"POST"}},
+	{Url: "/user/add", Func: []http.HandlerFunc{handlers.AddUser}, Method: []string{"POST"}},
 
 	{Url: "/login", Func: []http.HandlerFunc{handlers.LoginPost}, Method: []string{"POST"}},
 

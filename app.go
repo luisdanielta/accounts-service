@@ -16,14 +16,14 @@ func main() {
 
 	/* create server */
 	server := &http.Server{
-		Addr:         ":9015",
+		Addr:         ":9001",
 		Handler:      router,
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
 	}
 
 	/* start server */
-	log.Println("Server started at http://localhost:9015")
+	log.Println("Server started at http://localhost:9001")
 	err := server.ListenAndServe()
 	if err != nil {
 		log.Fatal(err.Error())

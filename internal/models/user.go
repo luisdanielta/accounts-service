@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -31,8 +32,8 @@ func (p *Password) Encrypt() (string, error) {
 	return string(hash), nil
 }
 
-func (p Password) Compare(plainPassword string) error {
-	return bcrypt.CompareHashAndPassword([]byte(p), []byte(plainPassword))
+func (p *Password) Compare(plainPassword string) error {
+	return bcrypt.CompareHashAndPassword([]byte(*p), []byte(plainPassword))
 }
 
 /* funcs email type */
@@ -44,15 +45,7 @@ func (e *Email) Validate(db *gorm.DB) (string, bool) {
 	}
 
 	/* Validate that the email has the correct domain */
-	/* validate email only quantum-fsd */
-	index := 0
-	for i, v := range email {
-		if string(v) == "@" {
-			index = i
-			break
-		}
-	}
-	if email[index:] != "@quantum-fsd.com" {
+	if !strings.HasSuffix(email, "@quantum-fsd.com") {
 		return "Email is not valid.", false
 	}
 
